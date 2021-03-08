@@ -9,7 +9,7 @@ using QML, ConfocalTrackerControl
 
 The main control loop can be stopped by:
 ```julia
-ConfocalControl.session.session.q_loop = false
+stop_loop_main()
 ```
 After stopping, the loop can be restarted by executing ```@async loop_main()```. To restart the loop after closing the GUI window, restart the kernel.
 
