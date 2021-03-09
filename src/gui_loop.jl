@@ -18,7 +18,7 @@ function loop_control(ch_control)
         # get image
         imid, imtimestamp = getimage!(cam, session.img_array,
             normalize=false, release=true)
-        
+
         # detect features
         net_out .= dlc.get_pose(session.img_array[IMG_CROP_RG_X, IMG_CROP_RG_Y])
         
@@ -169,10 +169,19 @@ function loop_main()
         @async loop_control(ch_control)
         
         local loop_count = 1
+        local q_recording = false
         
         start!(cam)
         Timer(0, interval=1/LOOP_INTERVAL_CONTROL) do timer
-            q_recording = session.q_recording            
+            if !q_recording && session.q_recording # start rec
+                stop!(cam)
+                start!(cam)
+            elseif q_recording && !(session.q_recording) # stop rec
+                stop!(cam)
+                start!(cam)
+            end
+            q_recording = session.q_recording
+                        
             if session.q_loop == false && loop_count == 1
                 close(ch_control)
                 close(ch_stage)

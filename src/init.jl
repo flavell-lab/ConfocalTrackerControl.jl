@@ -27,7 +27,11 @@ function __init__()
     # camera
     camlist = CameraList()
     global cam = camlist[0]
-
+    
+    Spinnaker.set!(Spinnaker.SpinFloatNode(cam, "AcquisitionFrameRate"),
+        Float64(LOOP_INTERVAL_CONTROL))
+    @assert(isapprox(Float64(LOOP_INTERVAL_CONTROL), framerate(cam), rtol=0.05))
+    
     triggermode!(cam, "Off")
     start!(cam)
     imid, imtimestamp = getimage!(cam, session.img_array, normalize=false)
