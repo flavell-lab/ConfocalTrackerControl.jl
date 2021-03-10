@@ -77,8 +77,13 @@ function loop_control(ch_control)
                 # 1s avg speed text
                 str_speed_avg = "N/A"
                 if length(session.speed_cb) > 0
-                    Δt_cb = (session.speed_cb[end].t - session.speed_cb[1].t) / 1e9 # seconds
-                    speed_worm_stage = sum(map(x->x.val, session.speed_cb)) / Δt_cb 
+                    cbnan = map(x->all(.!(isnan.(x.val))), session.speed_cb)
+                    cb_first = session.speed_cb[findfirst(cbnan)]
+                    cb_last = session.speed_cb[findlast(cbnan)]
+                    
+                    Δt_cb = (cb_last.t - cb_first.t) / 1e9 # seconds
+                    Δstage =  norm(cb_last.val .- cb_first.val, 2)
+                    speed_worm_stage = Δstage / Δt_cb 
                     speed_worm_mm = covert_stage_unit_to_mm(speed_worm_stage) # mm/s
                     str_speed_avg = rpad(string(round(speed_worm_mm, digits=2)), 4, "0")
                     @emit updateTextSpeedAvg(str_speed_avg)
@@ -142,9 +147,7 @@ function loop_stage(ch_stage)
             query_position(sp_stage)
             sleep(0.025)
             x_stage, y_stage = Float64.(read_position(sp_stage) ./ 2)
-
-            Δstage = norm([x_stage, y_stage] .- [session.x_stage, session.y_stage], 2)
-            push!(session.speed_cb, ValWithTime(Δstage))
+            push!(session.speed_cb, ValWithTime((x_stage, y_stage)))
             session.x_stage = x_stage
             session.y_stage = y_stage
         catch
@@ -175,9 +178,11 @@ function loop_main()
         Timer(0, interval=1/LOOP_INTERVAL_CONTROL) do timer
             if !q_recording && session.q_recording # start rec
                 stop!(cam)
+                sleep(0.001)
                 start!(cam)
             elseif q_recording && !(session.q_recording) # stop rec
                 stop!(cam)
+                sleep(0.001)
                 start!(cam)
             end
             q_recording = session.q_recording

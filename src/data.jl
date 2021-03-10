@@ -47,8 +47,8 @@ Base.@kwdef mutable struct SessionData
     list_di_read = []
     
     # speed cb
-    speed_cb = CircularBuffer{ValWithTime{Float64}}(ceil(Int,
-            1/LOOP_INTERVAL_SAVE_STAGE ^ -1))
+    speed_cb = CircularBuffer{ValWithTime{Tuple{Float64,Float64}}}(ceil(Int,
+            (1 / LOOP_INTERVAL_SAVE_STAGE ^ -1) / 2))
 end
 
 function reset!(session::SessionData)
