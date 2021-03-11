@@ -21,8 +21,8 @@ function nidaq_configure()
     # configure sample clocks
     # AI
     NIDAQ.DAQmxCfgSampClkTiming(task_ai.th, ptr_empty_str, NIDAQ_SAMPLE_RATE_AI, NIDAQ.DAQmx_Val_Rising,
-        NIDAQ.DAQmx_Val_ContSamps, 10 * NIDAQ_SAMPLE_RATE_AI)
+        NIDAQ.DAQmx_Val_ContSamps, 100 * NIDAQ_SAMPLE_RATE_AI)
     # DI
     NIDAQ.DAQmxCfgSampClkTiming(task_di.th, "ai/SampleClock", NIDAQ_SAMPLE_RATE_AI, NIDAQ.DAQmx_Val_Rising,
-        NIDAQ.DAQmx_Val_ContSamps, 10 * NIDAQ_SAMPLE_RATE_AI)
+        NIDAQ.DAQmx_Val_ContSamps, 100 * NIDAQ_SAMPLE_RATE_AI)
 end

@@ -22,7 +22,7 @@ function loop_control(ch_control)
         
         # detect features
         net_out .= dlc.get_pose(session.img_array[IMG_CROP_RG_X, IMG_CROP_RG_Y])
-        
+
         # offsetting since input image to net is cropped
         y_nose, y_mid, y_pharynx = round.(Int, net_out[:,1]) .+ IMG_CROP_RG_Y[1]
         x_nose, x_mid, x_pharynx = round.(Int, net_out[:,2]) .+ IMG_CROP_RG_X[1]
@@ -162,9 +162,13 @@ end
 
 function loop_recording(ch_recording)
     for (q_iter_save, q_recording) in ch_recording
+        try 
         if q_recording
             push!(session.list_ai_read, read(task_ai, 1000))
             push!(session.list_di_read, read(task_di, 1000))
+        end
+        catch e
+            println("rec: $e")
         end
     end
 end
@@ -178,7 +182,7 @@ function loop_main()
     @sync begin
         @async loop_stage(ch_stage)
         @async loop_control(ch_control)
-        @async loop_recording(ch_recording)
+        Threads.@spawn loop_recording(ch_recording)
         
         local loop_count = 1
         local q_recording = false
@@ -188,6 +192,7 @@ function loop_main()
             if !q_recording && session.q_recording # start rec
                 start(task_ai)
                 start(task_di)
+                sleep(0.125)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
@@ -217,8 +222,8 @@ function loop_main()
                 put!(ch_control, (false, q_recording))
                 loop_count += 1
             end
-        end
-    end    
+        end # timer
+    end         
 end
 
 function stop_loop_main()
