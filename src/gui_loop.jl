@@ -20,9 +20,6 @@ function loop_control(ch_control)
             normalize=false, release=true)
 
         # detect features
-        net_out .= dlc.get_pose(session.img_array[IMG_CROP_RG_X, IMG_CROP_RG_Y])
-        
-        # offsetting since input image to net is cropped
         y_nose, y_mid, y_pharynx = round.(Int, net_out[:,1]) .+ IMG_CROP_RG_Y[1]
         x_nose, x_mid, x_pharynx = round.(Int, net_out[:,2]) .+ IMG_CROP_RG_X[1]
         p_nose, p_mid, p_pharynx = net_out[:,3]
@@ -159,17 +156,25 @@ function loop_stage(ch_stage)
     yield()
 end
 
-function loop_recording(ch_stage)
+function loop_recording(ch_recording)
+    for (q_iter_save, q_recording) in ch_recording
+        if q_recording
+            push!(session.list_ai_read, read(task_ai, 1000))
+            push!(session.list_di_read, read(task_di, 1000))
+        end
+    end
 end
 
 function loop_main()
     ch_stage = Channel{Tuple{Bool,Bool}}(16)
     ch_control = Channel{Tuple{Bool,Bool}}(16)
+    ch_recording = Channel{Tuple{Bool,Bool}}(16)
     session.q_loop = true
 
     @sync begin
         @async loop_stage(ch_stage)
         @async loop_control(ch_control)
+        @async loop_recording(ch_recording)
         
         local loop_count = 1
         local q_recording = false
@@ -177,10 +182,14 @@ function loop_main()
         start!(cam)
         Timer(0, interval=1/LOOP_INTERVAL_CONTROL) do timer
             if !q_recording && session.q_recording # start rec
+                start(task_ai)
+                start(task_di)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
             elseif q_recording && !(session.q_recording) # stop rec
+                stop(task_ai)
+                stop(task_di)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
@@ -192,9 +201,13 @@ function loop_main()
                 close(ch_stage)
                 close(timer)
                 stop!(cam)
-            elseif loop_count == 2
+            elseif isodd(loop_count)
                 put!(ch_control, (true, q_recording))
                 put!(ch_stage, (true, q_recording))
+                loop_count += 1
+            elseif loop_count == 8
+                put!(ch_control, (false, q_recording))
+                put!(ch_recording, (false, q_recording))
                 loop_count = 1
             else
                 put!(ch_control, (false, q_recording))

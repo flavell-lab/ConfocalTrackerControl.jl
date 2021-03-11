@@ -40,3 +40,7 @@ const RULER_RG_Y = sort(union(IMG_CENTER_Y:-FLIR_BFS_PIX_100UM:1,
         IMG_CENTER_Y:FLIR_BFS_PIX_100UM:IMG_SIZE_Y))
 
 const path_qmlfile = joinpath(dirname(@__FILE__), "gui.qml")
+
+# NIDAQ
+const NIDAQ_SAMPLE_RATE_AI = 5000 # Hz
+const NIDAQ_DEV_NAME = "Dev1"

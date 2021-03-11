@@ -61,5 +61,8 @@ function __init__()
     pid_x.setpoint = Float64.(0)
     pid_y.setpoint = Float64.(0)
     
+    # NIDAQ
+    nidaq_configure()
+    
     nothing
 end
