@@ -31,6 +31,8 @@ function __init__()
     Spinnaker.set!(Spinnaker.SpinFloatNode(cam, "AcquisitionFrameRate"),
         Float64(LOOP_INTERVAL_CONTROL))
     @assert(isapprox(Float64(LOOP_INTERVAL_CONTROL), framerate(cam), rtol=0.05))
+    Spinnaker.gain!(cam, 25.)
+    Spinnaker.exposure!(cam, 4000)
     
     triggermode!(cam, "Off")
     start!(cam)
