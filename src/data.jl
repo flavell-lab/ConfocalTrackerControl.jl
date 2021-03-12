@@ -20,7 +20,6 @@ Base.@kwdef mutable struct SessionData
     q_loop::Bool = true
     q_recording::Bool = false
     n_loop::Int = 0
-    t_recording_start::Int = 0
 
     # image
     img_array::Array{UInt8,2} = zeros(UInt8, IMG_SIZE_X, IMG_SIZE_Y)
@@ -41,6 +40,7 @@ Base.@kwdef mutable struct SessionData
     list_pos_net = []
     list_pos_stage::Array{Array{Float64,1},1} = []
     list_img::Array{Array{UInt8,2},1} = []
+    t_recording_start::Int = 0
     t_recording_start_str::String = ""
     
     # daq
