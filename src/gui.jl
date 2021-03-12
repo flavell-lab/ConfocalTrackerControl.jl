@@ -107,6 +107,7 @@ function toggle_recording()
     else
         reset_recording!(session)
         session.q_recording = true
+        session.t_recording_start_str = string(Dates.now())
         session.t_recording_start = time_ns()
         return "Stop"
     end

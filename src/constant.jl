@@ -43,4 +43,5 @@ const path_qmlfile = joinpath(dirname(@__FILE__), "gui.qml")
 
 # NIDAQ
 const NIDAQ_SAMPLE_RATE_AI = 5000 # Hz
+const NIDAQ_BUFFER_SIZE = 100 * NIDAQ_SAMPLE_RATE_AI
 const NIDAQ_DEV_NAME = "Dev1"

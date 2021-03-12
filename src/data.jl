@@ -41,8 +41,11 @@ Base.@kwdef mutable struct SessionData
     list_pos_net = []
     list_pos_stage::Array{Array{Float64,1},1} = []
     list_img::Array{Array{UInt8,2},1} = []
+    t_recording_start_str::String = ""
     
     # daq
+    buffer_ai = zeros(Float64, NIDAQ_BUFFER_SIZE)
+    buffer_di = zeros(UInt32, NIDAQ_BUFFER_SIZE)
     list_ai_read = []
     list_di_read = []
     
@@ -68,7 +71,7 @@ function reset!(session::SessionData)
 end
 
 function reset_recording!(session::SessionData)
-    session.n_loop = 0    
+    session.n_loop = 0
     session.list_pos_net = []
     session.list_pos_stage = []
     session.list_img = []
@@ -84,7 +87,7 @@ struct ValWithTime{T}
     ValWithTime(val::T) where {T} = new{T}(val, time_ns())
 end
 
-function save_h5(path_h5)
+function save_h5(path_h5; metadata::Union{Nothing,Dict{String,Any}}=nothing)
     @assert(splitext(path_h5)[end] == ".h5")
     @assert(!isfile(path_h5))
     
@@ -98,13 +101,27 @@ function save_h5(path_h5)
         feature_[:,:,t] .= session.list_pos_net[t]
         img_[:,:,t] .= session.list_img[t]
     end
-        
+       
+    ai_read = vcat(session.list_ai_read...)
+    di_read = vcat(session.list_di_read...)
+    
     h5open(path_h5, "cw") do h5f
+        if !isnothing(metadata)
+            for (k,v) = metadata
+                write(h5f, "metadata/$k", v)
+            end
+        end
+        
         h5f["img_nir", chunk=(IMG_SIZE_X, IMG_SIZE_Y, 1), blosc=9] = round.(UInt8, img_)
         attributes(h5f["img_nir"])["desc"] = "850 nm NIR image"
         
         write(h5f, "pos_feature", feature_)
         write(h5f, "pos_stage", stage_)
+        
+        write(h5f, "daqmx_ai", ai_read)
+        write(h5f, "daqmx_di", di_read)
+        
+        write(h5f, "recording_start", session.t_recording_start_str)
     end
     
     nothing

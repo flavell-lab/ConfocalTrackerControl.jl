@@ -134,7 +134,7 @@ function loop_control(ch_control)
 
             end
         end
-        yield()
+#         yield()
     end
 end
 
@@ -157,15 +157,14 @@ function loop_stage(ch_stage)
         session.x_stage, session.y_stage = x_stage, y_stage
         q_recording && push!(session.list_pos_stage, [x_stage, y_stage])
     end
-    yield()
+#     yield()
 end
 
 function loop_recording(ch_recording)
     for (q_iter_save, q_recording) in ch_recording
         try 
         if q_recording
-            push!(session.list_ai_read, read(task_ai, 1000))
-            push!(session.list_di_read, read(task_di, 1000))
+            nidaq_read_data()
         end
         catch e
             println("rec: $e")
@@ -182,7 +181,7 @@ function loop_main()
     @sync begin
         @async loop_stage(ch_stage)
         @async loop_control(ch_control)
-        Threads.@spawn loop_recording(ch_recording)
+        @async loop_recording(ch_recording) # Threads.@spawn
         
         local loop_count = 1
         local q_recording = false
@@ -192,16 +191,16 @@ function loop_main()
             if !q_recording && session.q_recording # start rec
                 start(task_ai)
                 start(task_di)
-                sleep(0.125)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
             elseif q_recording && !(session.q_recording) # stop rec
-                stop(task_ai)
-                stop(task_di)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
+                nidaq_read_data()
+                stop(task_ai)
+                stop(task_di)
             end
             q_recording = session.q_recording
                         
