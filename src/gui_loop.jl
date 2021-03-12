@@ -135,7 +135,7 @@ function loop_control(ch_control)
             end
         end
 #         yield()
-    end
+    end # for
 end
 
 function loop_stage(ch_stage)
