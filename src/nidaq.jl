@@ -40,7 +40,7 @@ function read_all_available!(t::NIDAQ.AITask, buffer::Array{Float64,1})
         1.0, # timeout
         reinterpret(Bool32, NIDAQ.Val_GroupByChannel), # fillMode
         Ref(buffer,1),
-        convert(UInt32, buffer_size * num_channels),
+        convert(UInt32, buffer_size),
         Ref(num_samples_per_chan_read,1),
         reinterpret(Ptr{Bool32},C_NULL)) )
 
@@ -60,7 +60,7 @@ function read_all_available!(t::NIDAQ.DITask, buffer::Array{UInt32,1})
             1.0,
             reinterpret(Bool32, NIDAQ.Val_GroupByChannel),
             Ref(buffer, 1),
-            convert(UInt32, buffer_size * num_channels),
+            convert(UInt32, buffer_size),
             Ref(num_samples_per_chan_read, 1),
             reinterpret(Ptr{Bool32}, C_NULL)))
     
