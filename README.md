@@ -22,7 +22,7 @@ Executing ```save_h5(path_h5)``` writes the current recording buffer to the prov
 ```julia
 metadata = Dict{String,Any}()
 metadata["ATR concentration"] = 1
-metadata["strain"] = "SWF999
+metadata["strain"] = "SWF999"
 metadata["salt concentration"] = 0.5
 
 save_h5(path_h5, metadata=metadata)
