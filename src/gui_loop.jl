@@ -190,8 +190,8 @@ function loop_main()
         start!(cam)
         Timer(0, interval=1/LOOP_INTERVAL_CONTROL) do timer
             if !q_recording && session.q_recording # start rec
-                start(task_ai)
                 start(task_di)
+                start(task_ai)
                 stop!(cam)
                 sleep(0.001)
                 start!(cam)
