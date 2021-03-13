@@ -13,7 +13,6 @@ function loop_control(ch_control)
     q_move_stage_count = 0
     
     for (q_iter_save, q_recording) in ch_control
-        try
 #         push!(list_t_control, time_ns())
         session.n_loop += 1
                 
@@ -137,10 +136,6 @@ function loop_control(ch_control)
             end
         end
 #         yield()
-    catch e
-        println(e)
-        push!(list_e, e)
-    end # try
     end # for
 end
 
