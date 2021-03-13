@@ -14,10 +14,25 @@ stop_loop_main()
 After stopping, the loop can be restarted by executing ```@async loop_main()```. To restart the loop after closing the GUI window, restart the kernel.
 
 ### Saving data
-Executing ```save_h5(path_h5)``` writes the current recording buffer to the provided path. The HDF5 file contains the following:  
+#### Saving function
+Executing ```save_h5(path_h5)``` writes the current recording buffer to the provided path.
+
+#### Metadata
+`save_h5` can save metadata:
+```julia
+metadata = Dict{String,Any}()
+metadata["ATR concentration"] = 1
+metadata["strain"] = "SWF999
+metadata["salt concentration"] = 0.5
+
+save_h5(path_h5, metadata=metadata)
+```
+
+#### HDF contents:
 `img_nir`: 850 nm images (sampling rate: 20 fps)  
 `pos_feature`: output of the neural network (sampling rate: 20 fps)  
 `pos_stage`: x/y stage location in the stage unit (10000 stage unit / 1 mm) (sampling rate: 20 fps)  
+If you saved metadata, you can access it by `metadata/$var`
 
 ### Parameters
 It is recommended to use the **default parameters**. If you'd like to change any, adjust the parameters before calling the main loop. Otherwise, you need to stop and restart the main loop.  
