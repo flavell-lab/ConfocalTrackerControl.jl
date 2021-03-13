@@ -38,10 +38,11 @@ Base.@kwdef mutable struct SessionData
     
     # recording
     list_pos_net = []
-    list_pos_stage::Array{Array{Float64,1},1} = []
-    list_img::Array{Array{UInt8,2},1} = []
+    list_pos_stage::Array{Array{Float64,1},1} = Array{Float64,1}[]
+    list_img::Array{Array{UInt8,2},1} = Array{UInt8,2}[]
     t_recording_start::Int = 0
     t_recording_start_str::String = ""
+    list_daqmx_read::Array{Tuple{Int,Int}} = Tuple{Int,Int}[]
     
     # daq
     buffer_ai = zeros(Float64, NIDAQ_BUFFER_SIZE)
@@ -72,11 +73,14 @@ end
 
 function reset_recording!(session::SessionData)
     session.n_loop = 0
+    buffer_ai .= 0
+    buffer_di .= 0
     session.list_pos_net = []
-    session.list_pos_stage = []
-    session.list_img = []
+    session.list_pos_stage = Array{Float64,1}[]
+    session.list_img = Array{UInt8,2}[]
     session.list_ai_read = []
     session.list_di_read = []
+    session.list_daqmx_read = Tuple{Int,Int}[]
 end
 
 struct ValWithTime{T}
