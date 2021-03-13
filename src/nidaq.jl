@@ -1,12 +1,3 @@
-macro daqmx_check(exp)
-    error_code = eval(exp)
-    if error_code != 0
-        error("DAQmx error $error_code")
-    end
-    
-    nothing
-end
-
 empty_str = ""
 ptr_empty_str = pointer(empty_str)
 
