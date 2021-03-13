@@ -76,7 +76,7 @@ end
 function nidaq_read_data()
     ai_n_read, ai_n_ch = read_all_available!(task_ai, session.buffer_ai)
     di_n_read, di_n_ch = read_all_available!(task_di, session.buffer_di)
-    push!(session.list_daqmx_read, (ai_n_read, ai_d_read))
+    push!(session.list_daqmx_read, (ai_n_read, di_n_read))
     push!(session.list_ai_read, reshape_daqmx_data(session.buffer_ai, ai_n_read, ai_n_ch))
     push!(session.list_di_read, reshape_daqmx_data(session.buffer_di, di_n_read, di_n_ch))
     
