@@ -73,8 +73,8 @@ end
 
 function reset_recording!(session::SessionData)
     session.n_loop = 0
-    buffer_ai .= 0
-    buffer_di .= 0
+    session.buffer_ai .= 0
+    session.buffer_di .= 0
     session.list_pos_net = []
     session.list_pos_stage = Array{Float64,1}[]
     session.list_img = Array{UInt8,2}[]
