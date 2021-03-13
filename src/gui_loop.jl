@@ -156,7 +156,7 @@ function loop_stage(ch_stage)
             x_stage, y_stage = NaN, NaN
         end
         session.x_stage, session.y_stage = x_stage, y_stage
-        q_recording && push!(session.list_pos_stage, [x_stage, y_stage])
+        q_recording && push!(session.list_pos_stage, Float64[x_stage, y_stage])
     end
 #     yield()
 end
@@ -168,7 +168,7 @@ function loop_recording(ch_recording)
             nidaq_read_data()
         end
         catch e
-            println("rec: $e")
+            showerror(stdout, e, catch_backtrace())
         end
     end
 end

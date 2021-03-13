@@ -47,8 +47,8 @@ Base.@kwdef mutable struct SessionData
     # daq
     buffer_ai = zeros(Float64, NIDAQ_BUFFER_SIZE)
     buffer_di = zeros(UInt32, NIDAQ_BUFFER_SIZE)
-    list_ai_read = []
-    list_di_read = []
+    list_ai_read = Array{Float64,2}[]
+    list_di_read = Array{UInt32,2}[]
     
     # speed cb
     speed_cb = CircularBuffer{ValWithTime{Tuple{Float64,Float64}}}(ceil(Int,
@@ -64,11 +64,11 @@ function reset!(session::SessionData)
     session.y_stage = 0
     
     session.list_pos_net = []
-    session.list_pos_stage = []
-    session.list_img = []
+    session.list_pos_stage = Array{Float64,1}[]
+    session.list_img = Array{UInt8,2}[]
     
-    session.list_ai_read = []
-    session.list_di_read = []
+    session.list_ai_read = Array{Float64,2}[]
+    session.list_di_read = Array{UInt32,2}[]
 end
 
 function reset_recording!(session::SessionData)
@@ -78,8 +78,8 @@ function reset_recording!(session::SessionData)
     session.list_pos_net = []
     session.list_pos_stage = Array{Float64,1}[]
     session.list_img = Array{UInt8,2}[]
-    session.list_ai_read = []
-    session.list_di_read = []
+    session.list_ai_read = Array{Float64,2}[]
+    session.list_di_read = Array{UInt32,2}[]
     session.list_daqmx_read = Tuple{Int,Int}[]
 end
 
