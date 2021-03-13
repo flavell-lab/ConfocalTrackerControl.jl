@@ -1,4 +1,3 @@
-list_e = []
 function loop_control(ch_control)
     img_array_uint32 = zeros(UInt32, IMG_SIZE_X, IMG_SIZE_Y)
     
