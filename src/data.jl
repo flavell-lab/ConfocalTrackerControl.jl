@@ -43,6 +43,7 @@ Base.@kwdef mutable struct SessionData
     t_recording_start::Int = 0
     t_recording_start_str::String = ""
     list_daqmx_read::Array{Tuple{Int,Int}} = Tuple{Int,Int}[]
+    list_cam_info::Array{Tuple{Bool,Bool,Int,Int}} = Tuple{Bool,Bool,Int,Int}[]
     
     # daq
     buffer_ai = zeros(Float64, NIDAQ_BUFFER_SIZE)
@@ -81,6 +82,7 @@ function reset_recording!(session::SessionData)
     session.list_ai_read = Array{Float64,2}[]
     session.list_di_read = Array{UInt32,2}[]
     session.list_daqmx_read = Tuple{Int,Int}[]
+    session.list_cam_info = Tuple{Bool,Bool,Int,Int}[]
 end
 
 struct ValWithTime{T}
@@ -114,6 +116,10 @@ function save_h5(path_h5; metadata::Union{Nothing,Dict{String,Any}}=nothing)
             for (k,v) = metadata
                 write(h5f, "metadata/$k", v)
             end
+        end
+        
+        for (i,v) = enumerate(["q_iter_save", "q_recording", "img_id", "img_timestamp"])
+            write(h5f, "img_metadata/$v", map(x->x[i], session.list_cam_info))
         end
         
         h5f["img_nir", chunk=(IMG_SIZE_X, IMG_SIZE_Y, 1), blosc=9] = round.(UInt8, img_)

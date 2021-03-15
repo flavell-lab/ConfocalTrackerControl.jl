@@ -18,7 +18,7 @@ function loop_control(ch_control)
         # get image
         imid, imtimestamp = getimage!(cam, session.img_array,
             normalize=false, release=true)
-
+        q_recording && push!(session.list_cam_info, (q_iter_save, q_recording, imid, imtimestamp))
         
         # detect features
         net_out .= dlc.get_pose(session.img_array[IMG_CROP_RG_X, IMG_CROP_RG_Y])
@@ -74,7 +74,7 @@ function loop_control(ch_control)
             end # async
 
             # display update
-            @async begin
+            @async if !q_iter_save
                 # 1s avg speed text
                 str_speed_avg = "N/A"
                 if length(session.speed_cb) > 0
@@ -162,14 +162,8 @@ end
 
 function loop_recording(ch_recording)
     for (q_iter_save, q_recording) in ch_recording
-        try 
-        if q_recording
-            nidaq_read_data()
-        end
-        catch e
-            showerror(stdout, e, catch_backtrace())
-        end
-    end
+        q_recording && nidaq_read_data()
+    end 
 end
 
 function loop_main()
@@ -213,7 +207,7 @@ function loop_main()
                 put!(ch_control, (true, q_recording))
                 put!(ch_stage, (true, q_recording))
                 loop_count += 1
-            elseif loop_count == 8
+            elseif loop_count == 20
                 put!(ch_control, (false, q_recording))
                 put!(ch_recording, (false, q_recording))
                 loop_count = 1
