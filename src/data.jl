@@ -97,6 +97,10 @@ function save_h5(path_h5; metadata::Union{Nothing,Dict{String,Any}}=nothing)
     @assert(splitext(path_h5)[end] == ".h5")
     @assert(!isfile(path_h5))
     
+    if session.q_tracking
+        error("Disable tracking before saving")
+    end
+    
     n_t = length(session.list_pos_stage)
     stage_ = zeros(Float64, 2,n_t)
     feature_ = zeros(Float32, 3,3,n_t)
