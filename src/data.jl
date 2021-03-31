@@ -23,7 +23,7 @@ Base.@kwdef mutable struct SessionData
 
     # image
     img_array::Array{UInt8,2} = zeros(UInt8, IMG_SIZE_X, IMG_SIZE_Y)
-    
+
     # tracking
     q_tracking::Bool = false
     
@@ -98,32 +98,24 @@ function save_h5(path_h5; metadata::Union{Nothing,Dict{String,Any}}=nothing)
     @assert(!isfile(path_h5))
     
     n_t = length(session.list_pos_stage)
-    stage_ = zeros(Float64, 2, n_t)
+    stage_ = zeros(Float64, 2,n_t)
     feature_ = zeros(Float32, 3,3,n_t)
-    img_ = zeros(UInt8, IMG_SIZE_X, IMG_SIZE_Y, n_t)
     
     for t = 1:n_t
         stage_[:,t] .= session.list_pos_stage[t]
         feature_[:,:,t] .= session.list_pos_net[t]
-        img_[:,:,t] .= session.list_img[t]
     end
        
     ai_read = vcat(session.list_ai_read...)
     di_read = vcat(session.list_di_read...)
     
     h5open(path_h5, "cw") do h5f
+        # save user supplied metadata
         if !isnothing(metadata)
             for (k,v) = metadata
                 write(h5f, "metadata/$k", v)
             end
         end
-        
-        for (i,v) = enumerate(["q_iter_save", "q_recording", "img_id", "img_timestamp"])
-            write(h5f, "img_metadata/$v", map(x->x[i], session.list_cam_info))
-        end
-        
-        h5f["img_nir", chunk=(IMG_SIZE_X, IMG_SIZE_Y, 1), blosc=9] = round.(UInt8, img_)
-        attributes(h5f["img_nir"])["desc"] = "850 nm NIR image"
         
         write(h5f, "pos_feature", feature_)
         write(h5f, "pos_stage", stage_)
@@ -132,6 +124,21 @@ function save_h5(path_h5; metadata::Union{Nothing,Dict{String,Any}}=nothing)
         write(h5f, "daqmx_di", di_read)
         
         write(h5f, "recording_start", session.t_recording_start_str)
+        
+        # save camera metadata
+        for (i,v) = enumerate(["q_iter_save", "q_recording", "img_id", "img_timestamp"])
+            write(h5f, "img_metadata/$v", map(x->x[i], session.list_cam_info))
+        end
+        
+        img_nir = create_dataset(h5f, "img_nir", datatype(UInt8),
+            dataspace(IMG_SIZE_X, IMG_SIZE_Y, length(session.list_img)),
+            chunk=(IMG_SIZE_X, IMG_SIZE_Y, 1), blosc=9)
+        
+        @showprogress for t = 1:length(session.list_img)
+            img_nir[:,:,t] = session.list_img[t]
+        end
+        
+        attributes(img_nir)["desc"] = "850 nm NIR image"
     end
     
     nothing
