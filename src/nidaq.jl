@@ -1,7 +1,7 @@
 empty_str = ""
 ptr_empty_str = pointer(empty_str)
 
-function nidaq_configure()
+function init_nidaq()
     # tasks creation
     # analog: laser (488 nm analog), stim for opto (AO))
     global task_ai = analog_input("$NIDAQ_DEV_NAME/ai0, $NIDAQ_DEV_NAME/ai1, $NIDAQ_DEV_NAME/_ao0_vs_aognd",
