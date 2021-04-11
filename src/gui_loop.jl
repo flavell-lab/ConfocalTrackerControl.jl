@@ -24,8 +24,8 @@ function loop_control(ch_control)
         net_out .= dlc.get_pose(session.img_array[IMG_CROP_RG_X, IMG_CROP_RG_Y])
 
         # offsetting since input image to net is cropped
-        y_nose, y_mid, y_pharynx = round.(Int, net_out[:,1]) .+ IMG_CROP_RG_Y[1]
-        x_nose, x_mid, x_pharynx = round.(Int, net_out[:,2]) .+ IMG_CROP_RG_X[1]
+        y_nose, y_mid, y_pharynx = round.(Int, net_out[:,1]) .+ IMG_CROP_RG_Y[1] .+ 1
+        x_nose, x_mid, x_pharynx = round.(Int, net_out[:,2]) .+ IMG_CROP_RG_X[1] .+ 1
         p_nose, p_mid, p_pharynx = net_out[:,3]
         
         @sync begin
