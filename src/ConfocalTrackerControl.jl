@@ -2,7 +2,7 @@ module ConfocalTrackerControl
 
 using QML, Spinnaker, PyCall, LinearAlgebra, Statistics, CxxWrap,
     StageControl, LibSerialPort, Dates, DataStructures, HDF5,
-    NIDAQ, ProgressMeter
+    NIDAQ, ProgressMeter, Qt5QuickControls2_jll
     
 include("constant.jl")
 include("unit.jl")
