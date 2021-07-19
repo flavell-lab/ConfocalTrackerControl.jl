@@ -151,7 +151,7 @@ function start_gui()
     @qmlfunction send_halt_stage
     @qmlfunction window_close
 
-    load(path_qmlfile,
+    loadqml(path_qmlfile,
         cf_update=CxxWrap.@safe_cfunction(update_img, Cvoid, 
             (Array{UInt32,1}, Int32, Int32)))
     exec_async()
