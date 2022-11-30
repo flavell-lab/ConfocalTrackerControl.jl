@@ -14,6 +14,7 @@ stop_loop_main()
 After stopping, the loop can be restarted by executing ```@async loop_main()```. To restart the loop after closing the GUI window, restart the kernel.
 
 ### Saving data
+Note that the data is saved to memory first and not streamed to disk online, and thus the total recording duration is limited by the system memory size.
 #### Saving function
 Executing ```save_h5(path_h5)``` writes the current recording buffer to the provided path.
 
