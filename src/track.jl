@@ -51,8 +51,8 @@ end
 """
     get_offset_loc(pts, Δd=15)
 
-Finds loc (x,y) that is Δd away from the pharynx (x_p, y_p)
-towards the mid point (x_m, y_m)
+Finds loc (x,y) that is Δd away from the midpoint (x_m, y_m)
+towards the pharynx (x_p, y_p)
 
 Arguments
 ---------
@@ -61,18 +61,10 @@ Arguments
 """
 function get_offset_loc(pts, Δd=15)
     x_n, x_m, x_p, y_n, y_m, y_p = pts
-    
-    if x_p == x_m
-        return x_m, y_m - Δd
-    else
-        m = (y_m - y_p) / (x_m - x_p)
-        b = y_m - x_m * (y_m - y_p) / (x_m - x_p)
 
-        uhat = [1,0]
-        v = [x_p - x_m, y_p - y_m]
+    ratio = Δd / norm([x_p - x_m, y_p - y_m])
+    x_new = x_m + (x_p - x_m) * ratio
+    y_new = y_m + (y_p - y_m) * ratio
 
-        Δx = Δd * (dot(uhat, v) / (norm(uhat) * norm(v)))
-
-        return x_m + Δx, (x_m + Δx) * m + b
-    end
+    return x_new, y_new
 end
